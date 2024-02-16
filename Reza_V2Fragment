@@ -1,0 +1,656 @@
+{
+  "log": {
+    "level": "warn",
+    "output": "box.log",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "dns-remote",
+        "address": "https://dnslow.me/dns-query",
+        "address_resolver": "dns-direct"
+      },
+      {
+        "tag": "dns-trick-direct",
+        "address": "https://sky.rethinkdns.com/",
+        "detour": "direct-fragment"
+      },
+      {
+        "tag": "dns-direct",
+        "address": "1.1.1.1",
+        "address_resolver": "dns-local",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-local",
+        "address": "local",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-block",
+        "address": "rcode://success"
+      }
+    ],
+    "rules": [
+      {
+        "domain": [
+          "dnslow.me",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir",
+          "www.zula.ir"
+        ],
+        "server": "dns-direct"
+      },
+      {
+        "domain_suffix": ".ir",
+        "geosite": "ir",
+        "server": "dns-direct"
+      },
+      {
+        "domain": "cp.cloudflare.com",
+        "server": "dns-remote",
+        "rewrite_ttl": 3000
+      }
+    ],
+    "final": "dns-remote",
+    "static_ips": {
+      "sky.rethinkdns.com": [
+        "188.114.96.3",
+        "188.114.97.3",
+        "2a06:98c1:3120::6",
+        "2a06:98c1:3121::6",
+        "104.18.202.232",
+        "104.18.203.232",
+        "172.64.111.10",
+        "172.64.110.10",
+        "2606:4700:e0::ac40:6e0a",
+        "2606:4700:e0::ac40:6f0a"
+      ]
+    },
+    "independent_cache": true
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "mtu": 9000,
+      "inet4_address": "172.19.0.1/28",
+      "inet6_address": "fdfe:dcba:9876::1/126",
+      "auto_route": true,
+      "strict_route": true,
+      "endpoint_independent_nat": true,
+      "sniff": true,
+      "sniff_override_destination": true,
+      "domain_strategy": "prefer_ipv4"
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 2334,
+      "sniff": true,
+      "sniff_override_destination": true,
+      "domain_strategy": "prefer_ipv4"
+    },
+    {
+      "type": "direct",
+      "tag": "dns-in",
+      "listen": "127.0.0.1",
+      "listen_port": 6450,
+      "override_address": "1.1.1.1",
+      "override_port": 53
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "select",
+      "outbounds": [
+        "auto",
+        "V2RAY_CONF-443 | 1",
+        "V2RAY_CONF-8443 | 2",
+        "V2RAY_CONF-2053 | 3",
+        "V2RAY_CONF-2096 | 4",
+        "V2RAY_CONF-2087 | 5",
+        "V2RAY_CONF-2083 | 6",
+        "V2RAY_CONF-443-warp | 7",
+        "V2RAY_CONF-8443-warp | 8",
+        "V2RAY_CONF-2053-warp | 9",
+        "V2RAY_CONF-2096-warp | 10",
+        "V2RAY_CONF-2087-warp | 11",
+        "V2RAY_CONF-2083-warp | 12"
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": [
+        "V2RAY_CONF-443 | 1",
+        "V2RAY_CONF-8443 | 2",
+        "V2RAY_CONF-2053 | 3",
+        "V2RAY_CONF-2096 | 4",
+        "V2RAY_CONF-2087 | 5",
+        "V2RAY_CONF-2083 | 6",
+        "V2RAY_CONF-443-warp | 7",
+        "V2RAY_CONF-8443-warp | 8",
+        "V2RAY_CONF-2053-warp | 9",
+        "V2RAY_CONF-2096-warp | 10",
+        "V2RAY_CONF-2087-warp | 11",
+        "V2RAY_CONF-2083-warp | 12"
+      ],
+      "url": "http://cp.cloudflare.com/",
+      "interval": "10m0s"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-443 | 1",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 443,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-8443 | 2",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 8443,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2053 | 3",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2053,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2096 | 4",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2096,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2087 | 5",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2087,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2083 | 6",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2083,
+      "uuid": "8721355e-96d5-4bb9-a99b-b6119d6b1cd4",
+      "tls": {
+        "enabled": true,
+        "server_name": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "u6ZgHn5ZytarEt4s838Q76kQGd9MN61UFlU53560xV8nMu68gD7Q25Y3PX.pAges.DEv"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-443-warp | 7",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 443,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea0443",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-8443-warp | 8",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 8443,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea8443",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2053-warp | 9",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2053,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea2053",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2096-warp | 10",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2096,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea2096",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2087-warp | 11",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2087,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea2087",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "vless",
+      "tag": "V2RAY_CONF-2083-warp | 12",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      },
+      "server": "www.zula.ir",
+      "server_port": 2083,
+      "uuid": "b91b3053-9602-4a60-b848-ec0eafea2083",
+      "tls": {
+        "enabled": true,
+        "server_name": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "tls_tricks": {
+          "mixedcase_sni": true
+        }
+      },
+      "multiplex": {
+        "protocol": "smux",
+        "max_streams": 32
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "U6zGhn5zyTAreT4s838q76KqGd9mN61Uflu53560Xv8nMU68gD7Q25y3PX.PAGeS-deV.siTe"
+        },
+        "early_data_header_name": "Sec-WebSocket-Protocol"
+      },
+      "packet_encoding": "xudp"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "direct",
+      "tag": "direct-fragment",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "5-10",
+        "sleep": "1-5"
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "bypass"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+  "route": {
+    "geoip": {
+      "path": "geo-assets/sagernet-sing-geoip-geoip.db"
+    },
+    "geosite": {
+      "path": "geo-assets/sagernet-sing-geosite-geosite.db"
+    },
+    "rules": [
+      {
+        "inbound": "dns-in",
+        "outbound": "dns-out"
+      },
+      {
+        "port": 53,
+        "outbound": "dns-out"
+      },
+      {
+        "clash_mode": "Direct",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Global",
+        "outbound": "select"
+      },
+      {
+        "domain_suffix": ".ir",
+        "geosite": "ir",
+        "geoip": "ir",
+        "outbound": "bypass"
+      }
+    ],
+    "auto_detect_interface": true,
+    "override_android_vpn": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "clash.db"
+    },
+    "clash_api": {
+      "external_controller": "127.0.0.1:6756"
+    }
+  }
+}
